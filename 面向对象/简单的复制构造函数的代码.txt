@@ -1,0 +1,22 @@
+#include<iostream.h>
+class A
+{
+private:
+	int num;
+public:
+	A(int i){num=i;}//普通的带有参数的构造函数
+	A(const A &a);//参数为一个常量对象的复制构造函数
+	void GetNum(){cout<<"num="<<num<<endl;cout<<"&num="<<&num<<endl;}//输出对象的内容信息
+};
+A::A(const A &a)//复制构造函数
+{
+	this->num=a.num;
+}
+void main()
+{
+	A a1(2);
+	a1.GetNum();
+	A a2(a1);
+	a2.GetNum();
+	//从运行上述程序的结果中可以看出，a1与a2的num的地址不相同，说明是一种深度复制
+}

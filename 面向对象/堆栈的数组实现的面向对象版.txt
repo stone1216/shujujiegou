@@ -1,0 +1,53 @@
+#include<iostream.h>
+class Stack
+{
+private:
+	int top;
+	int *a;
+	int MAXSIZE;
+public:
+	Stack(int size=10);
+	~Stack(){delete[] a;}
+	int IsEmpty();
+	int IsFull();
+	void Push(int);
+	int Pop();
+};
+Stack::Stack(int size)
+{
+	top=-1;
+	MAXSIZE=size;
+	a=new int[MAXSIZE];
+}
+int Stack::IsEmpty()
+{	if(top==-1) return 1;
+	else  return 0;
+}
+int Stack::IsFull()
+{   if(top>=MAXSIZE-1) return 1;
+    else return 0;
+}
+void Stack::Push(int data)
+{  	if(IsFull())
+	   cout<<"堆栈已满,无法再加入"<<endl; 
+	else
+	   a[++top]=data; //让data入栈
+}
+int Stack::Pop()
+{	if(IsEmpty())//如果栈空,返-1
+		return -1;
+	else
+		return a[top--];//如果栈非空,让栈顶元素stack[top]出栈
+}
+void main()
+{
+	Stack s(10);
+	s.Push(1);
+	s.Push(2);
+	s.Push(3);
+	s.Push(4);
+	cout<<s.Pop()<<endl;
+	cout<<s.Pop()<<endl;
+	cout<<s.Pop()<<endl;
+	cout<<s.Pop()<<endl;
+}

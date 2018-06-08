@@ -1,0 +1,266 @@
+#include<iostream.h>
+#include<cmath>
+//矩阵类
+class Matrix
+{
+public:
+	struct Node *head;//矩阵头指针
+	int dims;//矩阵维数
+	Matrix(int);//构造初始化
+	~Matrix(){delete head;}//析构函数
+	void Creat(int,int,int);//矩阵节点创建
+	void DataInput();//矩阵数据录入
+	void RowDelete(int);//删行
+	void ColDelete(int);//删列
+	void Delete(int,int);//删除对应元素的行列
+	void Restore();//矩阵恢复
+	void Display();//矩阵信息显示
+	void Copy(Matrix *);//矩阵拷贝函数
+	int Det();
+};
+
+//矩阵结点
+struct Node
+{
+	int num;//元素值
+	struct Node *rnext;//行指针
+	struct Node *cnext;//列指针
+};
+
+//构造函数
+Matrix::Matrix(int dims)//创建矩阵并初始化为0
+{
+	this->dims=dims;
+	head=NULL;
+	int i,j;
+	for(i=1;i<=dims;i++)
+		for(j=1;j<=dims;j++)
+			Creat(i,j,0);
+}
+
+//矩阵结点生成
+void Matrix::Creat(int i,int j,int num)
+{
+	Node *newnode=new Node,*ptr,*qtr;
+	newnode->num=num;
+	newnode->rnext=NULL;
+	newnode->cnext=NULL;
+	ptr=head;qtr=head;
+	if(i==1&&j==1)//1行1列的元素
+		head=newnode;
+	else
+	{
+		if(i==1&&j!=1)//第1行的元素
+		{
+			for(int k=1;k<=j-2;k++)
+				ptr=ptr->rnext;
+			ptr->rnext=newnode;
+		}
+		else
+			if(i!=1&&j==1)//第1列的元素
+			{
+				for(int k=1;k<=i-2;k++)
+					qtr=qtr->cnext;
+				qtr->cnext=newnode;
+			}
+			else//其余元素
+			{
+				for(int k=1;k<=j-1;k++)
+					qtr=qtr->rnext;
+				for(k=1;k<=i-1;k++)
+					ptr=ptr->cnext;
+				for(k=1;k<=j-2;k++)
+					ptr=ptr->rnext;
+				for(k=1;k<=i-2;k++)
+					qtr=qtr->cnext;
+				ptr->rnext=newnode;
+				qtr->cnext=newnode;
+			}
+	}
+}
+
+//矩阵数据录入
+void Matrix::DataInput()
+{
+	Node *ptr=head,*qtr;
+	cout<<"矩阵数据输入:"<<endl;
+	int i,j,k=1;
+	for(i=1;i<=dims;i++)
+	{
+		cout<<"请输入第"<<i<<"行元素:";
+		qtr=ptr;
+		for(j=1;j<=dims;j++)
+		{
+			cin>>k;
+			qtr->num=k;
+			qtr=qtr->rnext;
+		}
+		ptr=ptr->cnext;
+	}
+}
+
+//删行
+void Matrix::RowDelete(int i)
+{
+	Node *ptr=head,*qtr=head,*del=NULL;
+	if(i==1)//删第一行
+	{
+		head=head->cnext;
+		while(qtr!=NULL)
+		{
+			del=qtr;
+			qtr=qtr->rnext;
+			delete del;
+		}
+	}
+	else//删其余行
+	{
+		for(int k=1;k<=i-2;k++)
+			ptr=ptr->cnext;
+		while(ptr!=NULL)
+		{
+			qtr=ptr->cnext;
+			del=qtr;
+			ptr->cnext=qtr->cnext;
+			ptr=ptr->rnext;
+			delete del;
+		}
+	}
+}
+
+//删列
+void Matrix::ColDelete(int j)
+{
+	Node *ptr=head,*qtr=head,*del=NULL;
+	if(j==1)//删第一列
+	{
+		head=head->rnext;
+		while(qtr!=NULL)
+		{
+			del=qtr;
+			qtr=qtr->cnext;
+			delete del;
+		}
+	}
+	else//删其余列
+	{
+		for(int k=1;k<=j-2;k++)
+			ptr=ptr->rnext;
+		while(ptr!=NULL)
+		{
+			qtr=ptr->rnext;
+			del=qtr;
+			ptr->rnext=qtr->rnext;
+			ptr=ptr->cnext;
+			delete del;
+		}
+	}
+}
+
+//合并删除函数
+void Matrix::Delete(int i,int j)
+{
+	RowDelete(i);//删除对应行
+	ColDelete(j);//删除对应列
+	dims--;//维数减1
+}
+
+//矩阵恢复
+void Matrix::Restore()//将矩阵恢复至上一阶
+{
+	dims++;
+	for(int i=1;i<dims;i++)
+	{
+		Creat(dims,i,0);
+		Creat(i,dims,0);
+	}
+	Creat(dims,dims,0);
+}
+
+//矩阵信息显示
+void Matrix::Display()
+{
+	Node *ptr,*qtr;
+	qtr=head;
+	cout<<"矩阵维数为:"<<dims<<endl;
+	while(qtr!=NULL)
+	{
+		ptr=qtr;
+	    while(ptr!=NULL)
+		{
+		  cout<<ptr->num<<"\t";
+		  ptr=ptr->rnext;
+		}
+		cout<<endl;
+		qtr=qtr->cnext;
+	}
+}
+
+//矩阵拷贝函数
+void Matrix::Copy(Matrix *M1)//参数为一个指向矩阵对象的指针
+{
+	Node *p1=M1->head,*p2,*p3=head,*p4;
+	if(dims<M1->dims)
+		Restore();//当矩阵维数不一致时恢复预拷贝矩阵
+	for(int i=1;i<=dims;i++)
+	{
+		p2=p1;
+		p4=p3;
+		for(int j=1;j<=dims;j++)
+		{
+			p4->num=p2->num;
+			p2=p2->rnext;
+			p4=p4->rnext;
+		}
+		p1=p1->cnext;
+		p3=p3->cnext;
+	}
+}
+
+//行列式
+int Matrix::Det()
+{
+	Node *p=NULL;
+	int d=0;Node *ptr;
+	if(dims==2)//当矩阵为2阶的时候，直接计算行列式
+	{
+		ptr=head;
+		d=(ptr->num)*(ptr->rnext->cnext->num)
+			-(ptr->rnext->num)*(ptr->cnext->num);
+		return d;
+	}
+	else
+	{
+		for(int i=1;i<=dims;i++)
+		{
+			p=head;
+			for(int j=1;j<=i-1;j++)
+				p=p->rnext;
+			Matrix *Mx=new Matrix(dims);//动态创建的一个备份矩阵
+			Mx->Copy(this);//将原矩阵拷贝至动态矩阵中
+			Mx->Delete(1,i);//删除动态矩阵的对应行列
+			d=d+pow(-1,1+i)*(p->num)*Mx->Det();
+			delete Mx;//回收动态矩阵，避免内存冲突
+		}
+		return d;
+	}
+}
+//主函数
+void main()
+{
+	int d=0;
+	cout<<"----------------------------------------------"<<endl;
+	cout<<"---------------矩阵行列式---------------------"<<endl;
+	cout<<"----------------------------------------------"<<endl;
+	while(1)
+	{
+	   cout<<"请设定矩阵维数(大于1的整数,0退出):";cin>>d;
+	   if(d==0)
+		   break;
+	   Matrix M1(d);
+	   M1.DataInput();
+	   cout<<"所输入矩阵为:"<<endl;
+	   M1.Display();
+       cout<<"矩阵的行列式为:"<<M1.Det()<<endl;
+	}
+}

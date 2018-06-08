@@ -1,0 +1,58 @@
+#include<iostream.h>
+class Stack
+{
+private:
+	struct Node *top;
+public:
+	Stack();
+	//~Stack(){delete top;}
+	int IsEmpty();
+	void Push(int);
+	int Pop();
+};
+struct Node
+{
+	int data;
+	struct Node *next;
+};
+Stack::Stack()
+{
+	top=NULL;
+}
+int Stack::IsEmpty()
+{	
+	if(top==NULL) 
+		return 1;
+	else  
+		return 0;
+}
+void Stack::Push(int data)
+{
+	Node *newnode;
+	newnode=new Node;
+    newnode->data=data;//新结点的数据域赋值
+    newnode->next=top;//将新结点指向堆栈顶结点
+	top=newnode;//让新结点成为堆栈的栈顶指针
+}
+int Stack::Pop()
+{	
+	Node *ptr;
+	int value;
+	ptr=top;//指向堆栈的顶端
+	top=top->next;//将栈顶指针指向下一个结点
+	value=ptr->data;//取出栈顶结点的数据
+	delete ptr;//删除栈顶结点
+	return value;//将栈顶结点的数据返回给主程序
+}
+void main()
+{
+	Stack s;
+	s.Push(1);
+	s.Push(2);
+	s.Push(3);
+	s.Push(4);
+	cout<<s.Pop()<<endl;
+	cout<<s.Pop()<<endl;
+	cout<<s.Pop()<<endl;
+	cout<<s.Pop()<<endl;
+}

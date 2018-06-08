@@ -1,0 +1,127 @@
+#include<iostream.h>
+#define MaxWeight 110 //定义最大重量<即背包容量>
+struct Item
+{
+	int weight;
+	int value;
+	float p;
+	struct Item *next;
+};
+Item *head=NULL;
+int BagWeight=0;
+int TotalValue=0;
+void creat(int weight,int value)
+{
+	float x;
+	x=(float)value/weight;
+	Item *newitem=new Item,*ptr,*qtr,*rear;
+    newitem->weight=weight;
+	newitem->value=value;
+	newitem->p=x;
+	newitem->next=NULL;
+	if(head==NULL)
+	   head=newitem;
+	else
+	{  	ptr=head;
+	    while(ptr->next!=NULL)
+		    ptr=ptr->next;
+	    rear=ptr;
+		if(newitem->p>head->p)//插链头
+		{	newitem->next=head;
+			head=newitem;
+		}
+		else 
+			if(newitem->p<=rear->p)//插链尾
+			    rear->next=newitem;
+            else
+			{//插中间
+			    ptr=head;
+	            while(newitem->p<=ptr->p)
+				{ 
+					qtr=ptr;
+			        ptr=ptr->next;
+				}
+			    newitem->next=qtr->next;
+			    qtr->next=newitem;
+			}
+	}
+}
+void getItem(Item *p,int &weight,int &value)
+{
+	Item *ptr;
+	ptr=head;
+	if(head==p)
+	{
+		weight=head->weight;
+		value=head->value;
+		head=head->next;
+		delete ptr;
+	}
+	else
+	{
+		while(ptr->next!=p)
+		   ptr=ptr->next;
+		weight=p->weight;
+		value=p->value;
+		ptr->next=p->next;
+		delete p;
+	}
+}
+int IsEnd()
+{
+	Item *ptr=head;
+	while(ptr!=NULL)
+	{
+		if((BagWeight+ptr->weight)<=MaxWeight)
+			return 1;
+		ptr=ptr->next;
+	}
+	return 0;
+}
+void arrange()
+{
+	Item *ptr=head;
+	int weight,value;
+	while(IsEnd())
+	{
+		getItem(ptr,weight,value);
+		if(BagWeight+weight<MaxWeight)
+		{
+			BagWeight=BagWeight+weight;
+		    TotalValue=TotalValue+value;
+		}
+		ptr=ptr->next;
+		if(ptr==NULL)
+			ptr=head;
+	};
+	cout<<"最后的重量为:"<<BagWeight<<endl;
+	cout<<"总价值为:"<<TotalValue<<endl;
+}
+void disp()
+{
+	Item *ptr;
+	ptr=head;
+	while(ptr!=NULL)
+	{
+		cout<<ptr->weight<<"\t"<<ptr->value<<"\t"<<ptr->p<<endl;
+		ptr=ptr->next;
+	}
+}
+void main()
+{
+	int a,b;
+	creat(55,60);
+	creat(1,10);
+	creat(45,55);
+	creat(10,20);
+	creat(40,50);
+	creat(20,30);
+	creat(30,40);
+	creat(22,32);
+	disp();
+	getItem(head,a,b);
+	cout<<a<<"\t"<<b<<endl;
+	disp();
+	cout<<IsEnd()<<endl;
+	//arrange();
+}

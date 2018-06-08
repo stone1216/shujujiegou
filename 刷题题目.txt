@@ -1,0 +1,3056 @@
+/*
+一. There are N gas stations along a circular route, where the amount of gas at station i isgas[i].
+
+You have a car with an unlimited gas tank and it costscost[i]of gas to travel from station i to its next station (i+1). You begin the journey with an empty tank at one of the gas stations.
+
+Return the starting gas station's index if you can travel around the circuit once, otherwise return -1.
+
+Note: 
+The solution is guaranteed to be unique.
+*/
+
+class Solution {
+public:
+    int canCompleteCircuit(vector<int> &gas, vector<int> &cost) {
+              int total = 0, sum = 0;
+        int index = -1;
+        for(int i = 0; i < gas.size(); i++)
+        {
+            sum += gas[i] - cost[i];        //本次消耗
+            total += gas[i] - cost[i];  //总消耗
+            if (sum < 0)
+            {
+                sum = 0;
+                index = i;    //记录解的位置
+            }
+        }
+        return total >= 0 ? index + 1 : -1;//只要total>=0，肯定有解
+    }
+ 
+};
+
+/*
+二. There are N children standing in a line. Each child is assigned a rating value.
+
+You are giving candies to these children subjected to the following requirements:
+
+Each child must have at least one candy.
+Children with a higher rating get more candies than their neighbors.
+What is the minimum candies you must give?
+*/
+class Solution {
+public:
+    int candy(vector<int> &ratings) {
+        int N=ratings.size();
+        vector<int> dp(N,1);
+         
+        for(int i=1;i<N;i++)
+        {
+            if(ratings[i]>ratings[i-1])
+                dp[i]=dp[i-1]+1;          
+             
+        }
+         
+        int sum=dp[N-1];
+       for(int i=N-2;i>=0;i--)
+        {
+            
+            if(ratings[i]>ratings[i+1]&&dp[i]<=dp[i+1])
+                dp[i]=dp[i+1]+1;        
+            sum+=dp[i];
+        }
+        return sum;
+         
+         
+    }
+};
+
+/*
+三.Given an array of integers, every element appears twice except for one. Find that single one.
+
+Note: 
+Your algorithm should have a linear runtime complexity. Could you implement it without using extra memory?
+*/
+
+class Solution {
+public:
+    int singleNumber(int A[], int n) {
+        int sum=0;
+         
+        for(int i=0;i<n;i++)
+            sum^=A[i];
+        return sum;
+    }
+};
+
+/*
+A linked list is given such that each node contains an additional random pointer which could point to any node in the list or null.
+
+Return a deep copy of the list.
+*/
+/**
+ * Definition for singly-linked list with a random pointer.
+ * struct RandomListNode {
+ *     int label;
+ *     RandomListNode *next, *random;
+ *     RandomListNode(int x) : label(x), next(NULL), random(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    RandomListNode *copyRandomList(RandomListNode *head) {
+        if(head==NULL)
+            return NULL;
+        RandomListNode *p=head;
+        while(p!=NULL)
+        {
+            RandomListNode *temp=new RandomListNode(p->label);
+            temp->next=p->next;
+            p->next=temp;
+            p=p->next->next;           
+        }
+        p=head;
+         
+        while(p!=NULL&&p->next!=NULL)
+        {
+            if(p->random!=NULL)
+                p->next->random=p->random->next;               
+            p=p->next->next;           
+        }
+         
+        RandomListNode *r=head->next;
+         
+        p=head;       
+        while(p!=NULL&&p->next!=NULL)
+        {              
+            p->next=p->next->next;
+            p=p->next;
+        }
+         
+        return r;
+         
+         
+         
+    }
+};
+
+/*
+Given a string s and a dictionary of words dict, determine if s can be segmented into a space-separated sequence of one or more dictionary words.
+
+For example, given
+s ="leetcode",
+dict =["leet", "code"].
+
+Return true because"leetcode"can be segmented as"leet code".
+*/
+class Solution {
+public:
+bool wordBreak(string s, unordered_set<string> &dict) {
+    int len = s.size();
+    vector<int>dp(len+1, 0);
+    dp[0]=1;
+    for(int i=0;i<dp.size();i++)
+    {
+ 
+        for(auto index=dict.begin();index!=dict.end();index++)
+        {
+           if(dp[i]==0)
+                continue;
+            int n=(*index).size();
+            if(i+n>len||n==0)
+                continue;
+            if(s.substr(i,n)==(*index))
+                    dp[i+n]=1;
+ 
+        }
+    }
+ 
+    return dp[len];
+ 
+}
+};
+
+/*
+Given a linked list, determine if it has a cycle in it.
+
+Follow up:
+Can you solve it without using extra space?
+*/
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    bool hasCycle(ListNode *head) {
+        if(head==NULL||head->next==NULL||head->next->next==NULL)
+            return false;  
+         
+        ListNode *low=head->next,*fast=head->next->next;
+        while(low!=fast)
+        {
+            if(fast->next==NULL||fast->next->next==NULL)
+                return false;
+            fast=fast->next->next;
+            low=low->next;           
+        }
+        return true;
+         
+         
+         
+    }
+};
+
+/*
+Given a linked list, return the node where the cycle begins. If there is no cycle, returnnull.
+
+Follow up:
+Can you solve it without using extra space?
+*/
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode *detectCycle(ListNode *head) {
+        if(head==NULL)
+            return NULL;
+        else if(head->next==NULL||head->next->next==NULL)
+            return NULL;
+        ListNode *low=head->next,*fast=head->next->next;
+        while(low!=fast&&fast->next!=NULL&&fast->next->next!=NULL)
+        {           
+            fast=fast->next->next;
+            low=low->next;           
+        }
+         
+      
+       if(low!=fast)
+            return NULL;
+        else
+        {
+             
+            ListNode *temp=head;           
+            while(temp!=low)
+             {
+                low=low->next;
+                temp=temp->next;
+              }
+               
+               
+            return low;
+             
+             
+        }
+         
+         
+    }
+};
+
+/*
+Given a singly linked list L: L 0→L 1→…→L n-1→L n,
+reorder it to: L 0→L n →L 1→L n-1→L 2→L n-2→…
+
+You must do this in-place without altering the nodes' values.
+
+For example,
+Given{1,2,3,4}, reorder it to{1,4,2,3}.
+*/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    void reorderList(ListNode *head) {
+        if(head==NULL||head->next==NULL||head->next->next==NULL)
+            return ;
+        ListNode *p=head;
+        ListNode *p1=head,*p2=head;
+        while(p2->next!=NULL&&p2->next->next!=NULL)
+        {
+            p2=p2->next->next;
+            p1=p1->next;
+             
+        }
+        p2=p1->next;
+        p1->next=NULL;
+         
+        //逆序
+        ListNode *q=NULL,*q1=p2,*q2;
+        while(q1!=NULL)
+        {
+             
+            q2=q1->next;
+            q1->next=q;
+            q=q1;
+            q1=q2;           
+        }
+    
+         
+        p1=head;
+        ListNode *temp1,*temp2;
+        while(q!=NULL&&p1!=NULL)
+        {
+            temp1=p1->next;
+            p1->next=q;
+            temp2=q->next;
+            q->next=temp1;
+            p1=temp1;
+            q=temp2;
+             
+             
+        }              
+ 
+ 
+    }
+};
+
+/*
+Given a binary tree, return the preorder traversal of its nodes' values.
+
+For example:
+Given binary tree{1,#,2,3},
+
+   1
+    \
+     2
+    /
+   3
+
+return[1,2,3].
+
+Note: Recursive solution is trivial, could you do it iteratively?
+*/
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+ 
+ 
+void helper(TreeNode *root,vector<int>& r)
+{
+    if(root!=NULL)
+    {
+        r.push_back(root->val);
+        helper(root->left,r);
+        helper(root->right,r);
+         
+         
+    }
+     
+}
+class Solution {
+public:
+    vector<int> preorderTraversal(TreeNode *root) {
+        vector<int>result;
+        helper(root,result);
+        return result;
+    }
+};
+
+/*
+Given a binary tree, return the postorder traversal of its nodes' values.
+
+For example:
+Given binary tree{1,#,2,3},
+
+   1
+    \
+     2
+    /
+   3
+
+return[3,2,1].
+
+Note: Recursive solution is trivial, could you do it iteratively
+*/
+
+void helper(TreeNode *root,vector<int>& r)
+{
+    if(root!=NULL)
+    {
+        helper(root->left,r);
+        helper(root->right,r);
+        r.push_back(root->val);
+         
+    }
+     
+}
+ 
+class Solution {
+public:
+    vector<int> postorderTraversal(TreeNode *root) {
+        vector<int> result;
+        if(root==NULL)
+            return result;
+        helper(root,result);
+        return result;
+         
+    }
+};
+
+
+/*
+Sort a linked list in O(n log n) time using constant space complexity
+*/
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+ ListNode *merge(ListNode *head1,ListNode *head2)
+ {
+     ListNode *p1=head1,*p2=head2;
+     ListNode temp(0);
+     ListNode *p=&temp;
+     while(p1&&p2)
+     {
+         if(p1->val>p2->val)
+          {
+             p->next=p2;
+            p2=p2->next;
+         }
+         else
+         {
+             p->next=p1;
+             p1=p1->next;
+ 
+         }
+         p=p->next;
+ 
+     }
+     if(p1) p->next=p1;
+     if(p2) p->next=p2;
+ 
+     return temp.next;
+ 
+ 
+ }
+ 
+ ListNode *sortList(ListNode *head) {
+     if(head==NULL||head->next==NULL)
+         return head;
+     ListNode *l=head,*f=head;
+     while(f->next!=NULL&&f->next->next!=NULL)
+     {
+         f=f->next->next;
+         l=l->next;
+     }
+ 
+     ListNode *right=sortList(l->next);
+     l->next=NULL;
+     ListNode *left=sortList(head);
+     return merge(left,right);
+ }
+};
+
+/*
+Evaluate the value of an arithmetic expression in Reverse Polish Notation.
+
+Valid operators are+,-,*,/. Each operand may be an integer or another expression.
+
+Some examples:
+
+  ["2", "1", "+", "3", "*"] -> ((2 + 1) * 3) -> 9
+  ["4", "13", "5", "/", "+"] -> (4 + (13 / 5)) -> 6
+
+  */
+
+class Solution {
+public:
+int evalRPN(vector<string> &tokens) {
+    int result;
+    stack<int> s;
+    for(int i=0;i<tokens.size();i++)
+    {
+        if(tokens[i]=="+")
+        {
+            int x=s.top();
+            s.pop();
+            int y=s.top();
+            s.pop();
+            result=x+y;
+            s.push(result);
+ 
+        }
+        else if(tokens[i]=="-")
+        {
+            int x=s.top();
+            s.pop();
+            int y=s.top();
+            s.pop();
+            result=y-x;
+            s.push(result);
+ 
+        }
+        else if(tokens[i]=="*")
+        {
+            int x=s.top();
+            s.pop();
+            int y=s.top();
+            s.pop();
+            result=x*y;
+            s.push(result);
+ 
+        }
+        else if(tokens[i]=="/")
+        {
+            int x=s.top();
+            s.pop();
+            int y=s.top();
+            s.pop();
+            result=y/x;
+            s.push(result);
+ 
+        }
+        else
+        {
+ 
+            s.push(atoi(tokens[i].c_str()));
+        }
+ 
+ 
+    }
+    return s.top();
+ 
+ 
+}
+ 
+};
+
+/*
+Given a binary tree, find its minimum depth.
+The minimum depth is the number of nodes along the shortest path from the root node down to the nearest leaf node.
+*/
+class Solution {
+     
+    void helper(TreeNode *root,int cnt,int &min1)
+    {
+        if(root==NULL)
+            return ;
+        if(root->left==NULL&&root->right==NULL)
+       {
+            min1=min(min1,cnt);
+       }
+        helper(root->left,cnt+1,min1);
+        helper(root->right,cnt+1,min1);       
+         
+    }
+     
+     
+public:
+    int run(TreeNode *root) {
+        if(root==NULL)
+            return 0;
+        int min1=(1<<31)-1;
+        helper(root,1,min1);
+        return min1;
+         
+    }
+};
+
+/*
+有一个数组a[N]顺序存放0~N-1，要求每隔两个数删掉一个数，到末尾时循环至开头继续进行，求最后一个被删掉的数的原始下标位置。
+以8个数(N=7)为例:｛0，1，2，3，4，5，6，7｝，0->1->2(删除)->3->4->5(删除)->6->7->0(删除),如此循环直到最后一个数被删除。
+*/
+#include<iostream>
+using namespace std;
+int getLive(int i, int m)
+{
+    if (i == 1)
+        return 1;
+    else
+        return (getLive(i - 1, m) + m - 1) % i + 1;
+}
+ 
+int main()
+{
+    int k;
+    while(cin>>k)
+    {
+        cout << getLive(k, 3)-1 << endl;
+    }
+ 
+    return 0;
+}
+
+/*
+对于一个字符串，我们想通过添加字符的方式使得新的字符串整体变成回文串，但是只能在原串的结尾添加字符，请返回在结尾添加的最短字符串。
+
+给定原字符串A及它的长度n，请返回添加的字符串。保证原串不是回文串。
+
+测试样例：
+"ab",2
+返回："a"
+*/
+class Palindrome {
+public:
+bool check(const string &A,int s,int d)
+{
+    int i=s,j=d;
+    while(i<j)
+    {
+        if(A[i]==A[j])
+            i++,j--;
+        else
+            break;
+    }
+    if(i<j)
+        return false;
+    else
+        return true;
+}
+string addToPalindrome(string A, int n) {
+    // write code here
+    int i=0;
+   // A.push_back(A[i]);
+    while(!check(A,0,A.size()-1))
+    {
+         
+        A.insert(A.end()-i,A[i]);
+        i++;
+    }
+    string r=A.substr(0,i);
+    reverse(r.begin(),r.end());
+    return r;
+}
+};
+
+/*
+对于一个字符串，请设计一个高效算法，计算其中最长回文子串的长度。
+
+给定字符串A以及它的长度n，请返回最长回文子串的长度。
+
+测试样例：
+"abc1234321ab",12
+返回：7
+*/
+
+class Palindrome {
+public:
+bool check(const string &A,int s,int d)
+{
+    int i=s,j=d;
+    while(i<j)
+    {
+        if(A[i]==A[j])
+            i++,j--;
+        else
+            break;
+    }
+    if(i<j)
+        return false;
+    else
+        return true;
+}
+int getLongestPalindrome(string A, int n) {
+ 
+    vector<int> dp(n,0);
+    int max=-1;
+    for(int i=0;i<n;i++)
+    {
+        for(int j=i;j>=0;j--)
+        {
+            if(check(A,j,i))
+            {
+                dp[i]=i-j+1;
+            }
+        }
+        max=max>dp[i]?max:dp[i];
+    }
+    return max;
+ 
+}
+};
+
+/*
+给定两个有序数组arr1和arr2，两个数组长度都为N，求两个数组中所有数的上中位数。
+例如：
+arr1 = {1,2,3,4};
+arr2 = {3,4,5,6};
+一共8个数则上中位数是第4个数，所以返回3。
+
+arr1 = {0,1,2};
+arr2 = {3,4,5};
+一共6个数则上中位数是第3个数，所以返回2。
+
+要求：时间复杂度O(logN)
+*/
+class Solution {
+public:
+int getUpMedian(vector<int> arr1, vector<int> arr2) {
+ 
+    int kth=arr1.size();
+    int i=0,j=0;
+    int cnt=0;
+    while(i<arr1.size()&&j<arr2.size())
+    {
+        if(arr1[i]<arr2[j])
+        {
+ 
+            cnt++;
+            if(cnt==kth)
+                return arr1[i];
+            i++;
+        }
+        else
+        {
+ 
+ 
+            cnt++;
+            if(cnt==kth)
+                return arr2[j];
+            j++;
+        }
+    }
+ 
+    while(i<arr1.size())
+    {
+        cnt++;
+        if(cnt==kth)
+            return arr1[i];
+        i++;
+    }
+ 
+    while(j<arr2.size())
+    {
+        cnt++;
+        if(cnt==kth)
+            return arr2[j];
+        j++;
+    }
+    return -1;
+     
+}
+};
+
+/*
+给定两个有序数组arr1和arr2，在给定一个整数k，返回两个数组的所有数中第K小的数。
+例如：
+arr1 = {1,2,3,4,5};
+arr2 = {3,4,5};
+K = 1;
+因为1为所有数中最小的，所以返回1；
+
+arr1 = {1,2,3};
+arr2 = {3,4,5,6};
+K = 4;
+因为3为所有数中第4小的数，所以返回3；
+
+要求：如果arr1的长度为N，arr2的长度为M，时间复杂度请达到O(log(min{M,N}))。
+*/
+class Solution {
+public:
+int findKthNum(vector<int> arr1, vector<int> arr2, int kth) {
+ 
+    int i=0,j=0;
+    int cnt=0;
+    while(i<arr1.size()&&j<arr2.size())
+    {
+        if(arr1[i]<arr2[j])
+        {
+ 
+            cnt++;
+            if(cnt==kth)
+                return arr1[i];
+            i++;
+        }
+        else
+        {
+ 
+ 
+            cnt++;
+            if(cnt==kth)
+                return arr2[j];
+            j++;
+        }
+    }
+ 
+    while(i<arr1.size())
+    {
+        cnt++;
+        if(cnt==kth)
+            return arr1[i];
+        i++;
+    }
+ 
+    while(j<arr2.size())
+    {
+        cnt++;
+        if(cnt==kth)
+            return arr2[j];
+        j++;
+    }
+     
+    return -1;
+}
+ 
+};
+
+/*
+A、B和C。如果C包含且仅包含来自A和B的所有字符，而且在C中属于A的字符之间保持原来在A中的顺序，属于B的字符之间保持原来在B中的顺序，那么称C是A和B的混编。实现一个函数，判断C是否是A和B的混编。
+
+给定三个字符串A,B和C，及他们的长度。请返回一个bool值，代表C是否是A和B的混编。保证三个串的长度均小于等于100。
+
+测试样例：
+"ABC",3,"12C",3,"A12BCC",6
+返回：true
+*/
+
+class Mixture {
+public:
+bool chkMixture(string A, int n, string B, int m, string C, int v) {
+    // write code here
+    if (n + m != v)
+        return false;
+     
+ 
+    vector<vector<int> >dp1(n, vector<int>(v, 0));
+ 
+    for (int i = 0; i < n; i++)
+    {
+        if (A[i] == C[0])
+        {
+            for (int j = i; j < n; j++)
+                dp1[j][0] = 1;
+            break;
+        }
+ 
+    }
+    for (int j = 0; j < v; j++)
+    {
+        if (A[0] == C[j])
+        {
+            for (int i = j; i < v; i++)
+                dp1[0][i] = 1;
+            break;
+        }
+    }
+ 
+    for (int i = 1; i < n; i++)
+    {
+        for (int j = 1; j < v; j++)
+        {
+            if (A[i] == C[j])
+                dp1[i][j] = dp1[i - 1][j - 1]+1;
+            else
+                dp1[i][j] = max(dp1[i - 1][j], dp1[i][j - 1]);
+ 
+        }
+    }
+ 
+    //display(dp1);
+    int x1=dp1[n-1][v-1];
+ 
+ 
+ 
+    vector<vector<int> >dp2(m, vector<int>(v, 0));
+ 
+    for (int i = 0; i < m; i++)
+    {
+        if (B[i] == C[0])
+        {
+            for (int j = i; j < m; j++)
+                dp2[j][0] = 1;
+            break;
+        }
+ 
+    }
+    for (int j = 0; j < v; j++)
+    {
+        if (B[0] == C[j])
+        {
+            for (int i = j; i < v; i++)
+                dp2[0][i] = 1;
+            break;
+        }
+    }
+ 
+    for (int i = 1; i < m; i++)
+    {
+        for (int j = 1; j < v; j++)
+        {
+            if (B[i] == C[j])
+                dp2[i][j] = dp2[i - 1][j - 1] + 1;
+            else
+                dp2[i][j] = max(dp2[i - 1][j], dp2[i][j - 1]);
+ 
+        }
+    }
+ 
+    //display(dp2);
+ 
+    int x2 = dp2[m - 1][v - 1];
+ 
+ 
+    if (x1 == n&&x2 == m)
+        return true;
+    else
+        return false;
+ 
+}
+};
+
+/*
+对于三个字符串A，B，C。我们称C由A和B交错组成当且仅当C包含且仅包含A，B中所有字符，且对应的顺序不改变。请编写一个高效算法，判断C串是否由A和B交错组成。
+
+给定三个字符串A,B和C，及他们的长度。请返回一个bool值，代表C是否由A和B交错组成。保证三个串的长度均小于等于100。
+
+测试样例：
+"ABC",3,"12C",3,"A12BCC",6
+返回：true
+*/
+class Mixture {
+public:
+bool chkMixture(string A, int n, string B, int m, string C, int v) {
+    // write code here
+    if (n + m != v)
+        return false;
+     
+ 
+    vector<vector<int> >dp1(n, vector<int>(v, 0));
+ 
+    for (int i = 0; i < n; i++)
+    {
+        if (A[i] == C[0])
+        {
+            for (int j = i; j < n; j++)
+                dp1[j][0] = 1;
+            break;
+        }
+ 
+    }
+    for (int j = 0; j < v; j++)
+    {
+        if (A[0] == C[j])
+        {
+            for (int i = j; i < v; i++)
+                dp1[0][i] = 1;
+            break;
+        }
+    }
+ 
+    for (int i = 1; i < n; i++)
+    {
+        for (int j = 1; j < v; j++)
+        {
+            if (A[i] == C[j])
+                dp1[i][j] = dp1[i - 1][j - 1]+1;
+            else
+                dp1[i][j] = max(dp1[i - 1][j], dp1[i][j - 1]);
+ 
+        }
+    }
+ 
+    //display(dp1);
+    int x1=dp1[n-1][v-1];
+ 
+ 
+ 
+    vector<vector<int> >dp2(m, vector<int>(v, 0));
+ 
+    for (int i = 0; i < m; i++)
+    {
+        if (B[i] == C[0])
+        {
+            for (int j = i; j < m; j++)
+                dp2[j][0] = 1;
+            break;
+        }
+ 
+    }
+    for (int j = 0; j < v; j++)
+    {
+        if (B[0] == C[j])
+        {
+            for (int i = j; i < v; i++)
+                dp2[0][i] = 1;
+            break;
+        }
+    }
+ 
+    for (int i = 1; i < m; i++)
+    {
+        for (int j = 1; j < v; j++)
+        {
+            if (B[i] == C[j])
+                dp2[i][j] = dp2[i - 1][j - 1] + 1;
+            else
+                dp2[i][j] = max(dp2[i - 1][j], dp2[i][j - 1]);
+ 
+        }
+    }
+ 
+    //display(dp2);
+ 
+    int x2 = dp2[m - 1][v - 1];
+ 
+ 
+    if (x1 == n&&x2 == m)
+        return true;
+    else
+        return false;
+ 
+}
+ 
+};
+
+/*
+亮亮深吸一口气，小心地将盒子打开，里面是一张地图，地图上除了一些奇怪的字母以外没有任何路线信息，
+这可让亮亮犯了愁，这些字母代表了什么意思呢？ 亮亮绞尽脑汁也想不出什么思路，突然，亮亮眼前一亮，
+“我可以把这些字母所有的排列方式全部写出来，一定可以找到答案！” 于是，亮亮兴奋的开始寻找字母里的秘密。
+*/
+#include<iostream>
+#include<string>
+#include<vector>
+#include<algorithm>
+using namespace std;
+ 
+ 
+ 
+ 
+void perms(int pos,string &s,vector<string> &r)
+{
+    if (pos == s.size() - 1)
+        r.push_back(s);
+    else
+    {
+        for (int i = pos; i < s.size(); i++)
+        {
+            swap(s[pos], s[i]);
+            perms(pos + 1, s, r);
+            swap(s[pos], s[i]);
+        }
+    }
+ 
+}
+ 
+ 
+int main()
+{
+    string s;
+    while (cin >> s)
+    {
+        vector<string> r;
+        perms(0, s, r);
+        sort(r.begin(), r.end());
+        for (int i = 0; i < r.size(); i++)
+        {
+            cout << r[i] << endl;
+        }
+    }
+    return 0;
+}
+
+//或
+// 偷懒解法，直接使用STL的next_permutation()
+#include <algorithm>
+#include <iostream>
+#include <string>
+using namespace std;
+int main()
+{
+    string s;
+    while (cin >> s)
+    {
+        sort(s.begin(), s.end());
+        do{
+            cout << s << endl;
+        } while (next_permutation(s.begin(), s.end()));
+    }
+    return 0;
+}
+
+/*
+风口之下，猪都能飞。当今中国股市牛市，真可谓“错过等七年”。 
+给你一个回顾历史的机会，已知一支股票连续n天的价格走势，
+以长度为n的整数数组表示，数组中第i个元素（prices[i]）代表该股票第i天的股价。
+ 假设你一开始没有股票，但有至多两次买入1股而后卖出1股的机会，并且买入前一定要先保证手上没有股票。
+ 若两次交易机会都放弃，收益为0。 设计算法，计算你能获得的最大收益。 输入数值范围：2<=n<=100,0<=prices[i]<=100
+ */
+class Solution {
+public:
+    /**
+     * 计算你能获得的最大收益
+     *
+     * @param prices Prices[i]即第i天的股价
+     * @return 整型
+     */
+int calculateMax(vector<int> prices) {
+     
+    int n = prices.size();
+    vector<int> dp1(n), dp2(n);
+    int temp,pos=0,r=-1;
+    for (int i = 1; i < n; i++)
+    {
+        if (prices[i]>prices[i - 1])
+        {
+            temp = prices[i] - prices[pos];
+            if (temp > r)
+                r = temp;
+        }
+        else
+        {
+            if (prices[i] < prices[pos])
+                pos = i;
+        }
+        dp1[i] = r;
+ 
+    }
+ 
+    pos = n - 1;
+    r = -1;
+    for (int i = n-2; i >=0; i--)
+    {
+        if (prices[i]<prices[i+1])
+        {
+            temp = prices[pos] - prices[i];
+            if (temp > r)
+                r = temp;
+        }
+        else
+        {
+            if (prices[i] > prices[pos])
+                pos = i;
+        }
+        dp2[i] = r;
+ 
+    }
+ 
+    int result = 0;
+ 
+    for (int i = 0; i < n; i++)
+        result = max(result, dp1[i] + dp2[i]);
+ 
+ 
+    return result;
+ 
+ 
+}
+};
+
+/*
+世界上有10种人，一种懂二进制，一种不懂。那么你知道两个int32整数m和n的二进制表达，有多少个位(bit)不同么？
+*/
+int count(int x)
+{
+    int cnt=0;
+    while(x)
+    {
+        x&=(x-1);
+        cnt++;
+         
+    }
+    return cnt;
+     
+}
+ 
+class Solution {
+public:
+    /**
+     * 获得两个整形二进制表达位数不同的数量
+     *
+     * @param m 整数m
+     * @param n 整数n
+     * @return 整型
+     */
+    int countBitDiff(int m, int n) {
+       int temp =m^n;
+        return count(temp);
+         
+    }
+};
+
+/*
+给定一棵完全二叉树的头节点head，返回这棵树的节点个数。如果完全二叉树的节点数为N，请实现时间复杂度低于O(N)的解法。
+*/
+/**
+struct TreeNode {
+    int val;
+    struct TreeNode *left;
+    struct TreeNode *right;
+    TreeNode(int x) :
+            val(x), left(NULL), right(NULL) {
+    }
+};
+*/
+class Solution {
+public:
+    int nodeNum(struct TreeNode* head) {
+        if(head==NULL)
+            return 0;
+        int l=nodeNum(head->left);
+        int r=nodeNum(head->right);
+        return l+r+1;
+         
+ 
+    }
+};
+
+/*
+定义局部最小的概念。arr长度为1时，arr[0]是局部最小。arr的长度为N(N>1)时，如果arr[0]<arr[1]，那么arr[0]是局部最小；
+如果arr[N-1]<arr[N-2]，那么arr[N-1]是局部最小；如果0<i<N-1，既有arr[i]<arr[i-1]又有arr[i]<arr[i+1]，那么arr[i]是局部最小。 
+给定无序数组arr，已知arr中任意两个相邻的数都不相等，写一个函数，只需返回arr中任意一个局部最小出现的位置即可。
+*/
+class Solution {
+public:
+    int getLessIndex(vector<int> arr) {
+        int N=arr.size();
+        if(N==0)
+            return -1;
+            for(int i=0;i<N;i++)
+            {
+                 if(i>0&&i<N-1)
+                {
+                if(arr[i-1]>arr[i]&&arr[i+1]>arr[i])
+                    return i;               
+                }
+                else if(i==0)
+                {
+                    if(arr[i]<arr[i+1])
+                        return i;
+                     
+                }
+                else
+                {
+                    if(arr[i]<arr[i-1])                       
+                        return i;                       
+                     
+                }
+                 
+            }
+        return 0;
+    }
+};
+
+/*
+请设计一个复杂度为O(n)的算法，计算一个未排序数组中排序后相邻元素的最大差值。
+
+给定一个整数数组A和数组的大小n，请返回最大差值。保证数组元素个数大于等于2小于等于500。
+
+测试样例：
+[9,3,1,10],4
+返回：6
+*/
+class MaxDivision {
+public:
+int findMaxDivision(vector<int> A, int n) {
+    // write code here
+    vector<int> v(65535);
+    int max_m=1<<31,min_m=(1<<31)-1;
+    for(int i=0;i<n;i++)
+   {
+        v[A[i]]=1;
+        if(A[i]>max_m)
+            max_m=A[i];
+        if(A[i]<min_m)
+            min_m=A[i];
+    }
+    int r;
+    int result=1<<31;
+    int pos=min_m;
+    for(int i=min_m+1;i<=max_m;i++)
+    {
+        if(v[i]==1)
+        {
+            r=i-pos;
+            pos=i;
+            result=max(r,result);
+        }
+    }
+    return result;
+ 
+ 
+}
+};
+
+/*
+请设计一个高效算法，查找数组中未出现的最小正整数。
+
+给定一个整数数组A和数组的大小n，请返回数组中未出现的最小正整数。保证数组大小小于等于500。
+
+测试样例：
+[-1,2,3,4],4
+*/
+class ArrayMex {
+public:
+int findArrayMex(vector<int> A, int n) {
+    // write code here
+    vector<int>dp(n,1);
+    set<int>flags;
+    for(int i=0;i<A.size();i++)
+    {
+        flags.insert(A[i]);
+    }
+    int j=1;
+    for(;;j++)
+    {
+        if(!flags.count(j))
+            return j;
+    }
+ 
+}
+};
+
+/*
+现定义数组单调和为所有元素i的f(i)值之和。这里的f(i)函数定义为元素i左边(不包括其自身)小于等于它的数字之和。请设计一个高效算法，计算数组的单调和。
+
+给定一个数组A同时给定数组的大小n，请返回数组的单调和。保证数组大小小于等于500，同时保证单调和不会超过int范围。
+
+测试样例：
+[1,3,5,2,4,6],6
+返回：27
+*/
+class MonoSum {
+public:
+int calcMonoSum(vector<int> A, int n) {
+    // write code here
+    int result=0;
+    for(int i=0;i<A.size();i++)
+    {
+        int temp=0;
+        for(int j=i-1;j>=0;j--)
+            if(A[j]<=A[i])
+                temp+=A[j];
+        result+=temp;
+    }
+    return result;
+ 
+}
+};
+
+
+/*
+正在挑战一个CrackMe的你，把需要填写的前面几位密码都正确猜出了，可是这最后一位密码，好像藏得有点深。
+CrackMe的作者还挑衅般的在里面藏了个.tar.gz文件，解压缩出来，里面写道 
+你要的最后一个字符就在下面这个字符串里，这个字符是下面整个字符串中第一个只出现一次的字符。
+（比如，串是abaccdeff，那么正确字符就是b了） 然而下面给出来的字符串好像太长太长了，单靠人力完全无法找出来。
+ 于是，你需要写一个程序代劳了。输入文件体积较大，请使用一些快速的输入输出手段，不推荐使用cin/cout，对Java并不推荐使用Scanner直接读写。
+ */
+#include <iostream>
+#include<vector>
+using namespace std;
+ 
+ 
+char check(const string &s)
+{
+    vector<int> v(100,0);
+    for(int i=0;i<s.size();i++)
+        v[s[i]-33]++;
+    for(int i=0;i<s.size();i++)
+        if(v[s[i]-33]==1)
+            return s[i];
+      return 0;
+}
+ 
+int main()
+{
+    int N;
+    while(cin>>N)
+    {
+        while(N--)
+        {
+            string s;
+            cin>>s;
+            cout<<check(s)<<endl;
+        }
+ 
+    }
+    return 0;
+}
+
+/*
+汇编语言中有一种移位指令叫做循环左移（ROL），现在有个简单的任务，就是用字符串模拟这个指令的运算结果。
+对于一个给定的字符序列S，请你把其循环左移K位后的序列输出。例如，字符序列S=”abcXYZdef”,要求输出循环左移3位后的结果，
+即“XYZdefabc”。是不是很简单？OK，搞定它！
+*/
+
+class Solution {
+public:
+    string LeftRotateString(string str, int n) {
+        if(str.empty())
+            return "";
+        if(n>str.size())
+            n%=str.size();
+        string s1=str.substr(0,n);
+        string s2=str.substr(n);
+        return s2+s1;
+    }
+};
+
+/*
+输入一个整数数组，实现一个函数来调整该数组中数字的顺序，使得所有的奇数位于数组的前半部分，
+所有的偶数位于位于数组的后半部分，并保证奇数和奇数，偶数和偶数之间的相对位置不变
+*/
+class Solution {
+public:
+    /*
+    void reOrderArray(vector<int> &array) {
+    stable_partition(array.begin(),array.end(),[](int x) {
+          if(x%2==1)
+              return true;
+          else
+              return false;
+    });
+    }
+    */
+     
+void reOrderArray(vector<int> &array) {
+    for(int i=0;i<array.size();i++)
+    {
+        int j=i;
+        int temp=array[i];
+        if(temp%2==1)
+        {
+            while(j>0&&(array[j-1]%2==0))
+            {
+            array[j]=array[j-1];
+            j--;
+             }
+            array[j]=temp;
+        }
+ 
+    }
+}
+};
+
+/*
+给定一个长度为N(N>1)的整型数组A，可以将A划分成左右两个部分，左部分A[0..K]，右部分A[K+1..N-1]，K可以取值的范围是[0,N-2]。求这么多划分方案中，左部分中的最大值减去右部分最大值的绝对值，最大是多少？
+
+给定整数数组A和数组的大小n，请返回题目所求的答案。
+
+测试样例：
+[2,7,3,1,1],5
+返回：6
+*/
+class MaxGap {
+public:
+int findMaxGap(vector<int> A, int n) {
+    // write code here
+    vector<int>dp1(n),dp2(n);
+    int max_m=(1<<31);
+    for(int i=0;i<n;i++)
+    {
+        max_m=max(max_m,A[i]);
+        dp1[i]=max_m;
+    }
+ 
+    int max_m1=(1<<31);
+    for(int i=n-1;i>=0;i--)
+    {
+        max_m1=max(max_m1,A[i]);
+        dp2[i]=max_m1;
+    }
+ 
+    int r=-1;
+    for(int i=0;i<n;i++)
+        if(abs(dp1[i]-dp2[i])>r)
+            r=abs(dp1[i]-dp2[i]);
+    return r;
+ 
+ 
+}
+};
+
+/*
+对于一个无序数组A，请设计一个算法，求出需要排序的最短子数组的长度。
+
+给定一个整数数组A及它的大小n，请返回最短子数组的长度。
+
+测试样例：
+[1,5,3,4,2,6,7],7
+返回：4*/
+class ShortSubsequence {
+public:
+int findShortest(vector<int> A, int n) {
+    // write code here
+    vector<int>dp1(n),dp2(n);
+    int flags1=0,flags2=1;
+    for(int i=0;i<n;i++)
+    {
+        int j=i,cnt=0;
+        while(j>=0)
+        {
+            if(A[j]>A[i])
+                cnt++;
+            j--;
+        }
+        if(cnt!=0)
+            flags1=i;
+ 
+    }
+ 
+    for(int i=n-1;i>=0;i--)
+    {
+        int j=i,cnt=0;
+        while(j<=n-1)
+        {
+            if(A[j]<A[i])
+                cnt++;
+            j++;
+        }
+        if(cnt!=0)
+            flags2=i;
+    }
+    return flags1-flags2+1;
+}
+};
+
+/*
+现在有两个好友A和B，住在一片长有蘑菇的由n＊m个方格组成的草地，A在(1,1),B在(n,m)。现在A想要拜访B，
+由于她只想去B的家，所以每次她只会走(i,j+1)或(i+1,j)这样的路线，在草地上有k个蘑菇种在格子里(多个蘑菇可能在同一方格),
+问：A如果每一步随机选择的话(若她在边界上，则只有一种选择)，那么她不碰到蘑菇走到B的家的概率是多少？
+*/
+
+#include <iostream>
+#include<vector>
+#include<iomanip>
+using namespace std;
+ 
+ 
+template <class T>
+ 
+void display(const T &t)
+{
+    int N=t.size();
+    for(int i=0;i<N;i++)
+    {
+        for(int j=0;j<t[i].size();j++)
+            cout<<t[i][j]<<" ";
+        cout<<endl;
+    }
+ 
+}
+ 
+int main()
+{
+    int m,n,k;
+ 
+    while(cin>>m>>n>>k)
+    {
+        vector<vector<int> > v(m+1,vector<int>(n+1,0));
+        for(int i=0;i<k;i++)
+        {
+            int x,y;
+            cin>>x>>y;
+            v[x][y]--;
+        }
+        vector<vector<double> > dp(m+1,vector<double>(n+1,0));
+        for(int i=1;i<=m;i++)
+            for(int j=1;j<=n;j++)
+            {
+ 
+                if(i==1&&j==1)
+                {
+                    dp[i][j]=1;
+                    continue;
+                }
+ 
+                if(v[i][j]<0)
+                 {
+                    //dp[i][j]=0.0;
+                    continue;
+                }
+ 
+                dp[i][j] = (i==m?1:0.5)*dp[i][j-1] + (j==n?1:0.5)*dp[i-1][j];
+ 
+              //  else
+//                 if(i==m&&j!=n)
+//                    dp[i][j]=dp[i][j-1]+0.5*dp[i-1][j];
+//                else if(i!=m&&j==n)
+//                    dp[i][j]=0.5*dp[i][j-1]+dp[i-1][j];
+//                else if(i==m&&j==n)
+//                    dp[i][j]=dp[i-1][j]+dp[i][j-1];
+//                else
+//                    dp[i][j]=dp[i-1][j]*0.5+0.5*dp[i][j-1];
+            }
+      //  display(dp);
+     //   cout<<endl<<endl;
+     //   display(v);
+        cout<<fixed<<setprecision(2)<<dp[m][n]<<endl;
+ 
+    }
+    return 0;
+}
+
+/*
+度度熊有一张网格纸，但是纸上有一些点过的点，每个点都在网格点上，若把网格看成一个坐标轴平行于网格线的坐标系的话，
+每个点可以用一对整数x，y来表示。度度熊必须沿着网格线画一个正方形，使所有点在正方形的内部或者边界。
+然后把这个正方形剪下来。问剪掉正方形的最小面积是多少。
+*/
+#include <iostream>
+#include<vector>
+#include<cmath>
+using namespace std;
+ 
+ 
+#include <iostream>
+#include<vector>
+#include<cmath>
+using namespace std;
+ 
+ 
+ 
+int main()
+{
+    int N;
+    while(cin>>N)
+    {
+        int max_x=1<<31,max_y=1<<31,min_x=(1<<31)-1,min_y=(1<<31)-1;
+        int x,y;
+        for(int i=0;i<N;i++)
+         {
+            cin>>x>>y;
+            if(x<min_x)
+                min_x=x;
+            if(x>max_x)
+                max_x=x;
+            if(y<min_y)
+                min_y=y;
+            if(y>max_y)
+                max_y=y;
+         }
+ 
+        int r= abs(max_x-min_x)>abs(max_y-min_y)?(max_x-min_x)*(max_x-min_x):(max_y-min_y)*(max_y-min_y);
+        cout<<r<<endl;
+ 
+ 
+    }
+}
+
+/*
+C市现在要转移一批罪犯到D市，C市有n名罪犯，按照入狱时间有顺序，另外每个罪犯有一个罪行值，值越大罪越重。
+现在为了方便管理，市长决定转移入狱时间连续的c名犯人，同时要求转移犯人的罪行值之和不超过t，问有多少种选择的方式？ */
+#include <iostream>
+#include<vector>
+using namespace std;
+ 
+int main()
+{
+    int n,t,c;
+    while(cin>>n>>t>>c)
+    {
+        vector<int> v(n);
+        for(int i=0;i<n;i++)
+            cin>>v[i];
+        int sum=0;
+        for(int i=0;i<c;i++)
+            sum+=v[i];
+        int count=0;
+        for(int i=c-1;i<v.size();i++)
+         {
+             
+           if(sum<=t)
+               count++;
+ 
+                sum-=v[i-c+1];
+                sum+=v[i+1];
+          }
+        cout<<count<<endl;
+    }
+    return 0;
+}
+
+/*
+请你实现一个简单的字符串替换函数。原串中需要替换的占位符为"%s",请按照参数列表的顺序一一替换占位符。若参数列表的字符数大于占位符个数。则将剩下的参数字符添加到字符串的结尾。
+
+给定一个字符串A，同时给定它的长度n及参数字符数组arg，请返回替换后的字符串。保证参数个数大于等于占位符个数。保证原串由大小写英文字母组成，同时长度小于等于500。
+
+测试样例：
+"A%sC%sE",7,['B','D','F']
+返回："ABCDEF"
+*/
+class StringFormat {
+public:
+string formatString(string A, int n, vector<char> arg, int m) {
+    // write code here
+    string result;
+    int j=0;
+    for(int i=0;i<A.size();i++)
+        if(i<A.size()-1&&A[i]=='%'&&A[i+1]=='s')
+            result.push_back(arg[j++]),i++;
+        else
+            result.push_back(A[i]);
+ 
+    while(j<m)
+        result.push_back(arg[j++]);
+   return result;
+ 
+}
+};
+
+/*
+有一个投篮游戏。球场有p个篮筐，编号为0，1...，p-1。每个篮筐下有个袋子，每个袋子最多装一个篮球。有n个篮球，每个球编号xi 。
+规则是将数字为xi 的篮球投到xi 除p的余数为编号的袋里
+。若袋里已有篮球则球弹出游戏结束输出i，否则重复至所有球都投完。输出-1。问游戏最终的输出是什么？
+*/
+#include <iostream>
+#include<vector>
+#include<unordered_map>
+using namespace std;
+ 
+ 
+ 
+int main()
+{
+    int n,p;
+    while(cin>>p>>n)
+    {
+     unordered_map<int ,int> m;
+     vector<int> v(n,0);
+     for(int i=0;i<n;i++)
+         cin>>v[i];
+ 
+ 
+    int i;
+     for( i=0;i<n;i++)
+     {
+         if(m[v[i]%p]==0)
+             m[v[i]%p]++;
+        else
+         {
+             cout<<i+1<<endl;
+             break;
+         }
+     }
+    if(i==n)
+      cout<<"-1"<<endl;
+    }
+    return 0;
+}
+
+/*
+给定一个递增序列，a1 <a2 <...<an 。定义这个序列的最大间隔为d=max{ai+1 - ai }(1≤i<n),
+现在要从a2 ,a3 ..an-1 中删除一个元素。问剩余序列的最大间隔最小是多少？
+*/
+#include <iostream>
+#include<vector>
+using namespace std;
+ 
+ 
+ 
+int check(const vector<int> &v)
+{
+    vector<int>dp(v.size(),(1<<31)-1);
+    int min_m=(1<<31)-1;
+    for(int i=1;i<v.size()-1;i++)
+    {
+        int m=v[i+1]-v[i-1];
+        int max_m=1<<31;
+        for(int k=1;k<i-1;k++)
+            max_m=max(max_m,v[k]-v[k-1]);
+        for(int k=i+1;k<v.size();k++)
+            max_m=max(max_m,v[k]-v[k-1]);
+        max_m=max(max_m,m);
+        dp[i]=max_m;
+        if(max_m<min_m)
+            min_m=max_m;
+    }
+    return min_m;
+}
+ 
+int main()
+{
+    int N;
+    while(cin>>N)
+    {
+        vector<int> v(N);
+     for(int i=0;i<N;i++)
+        cin>>v[i];
+ 
+    cout << check(v)<< endl;
+    }
+    return 0;
+}
+
+/*
+现在有一个字符串，你要对这个字符串进行 n 次操作，每次操作给出两个数字：(p, l) 表示当前字符串中从下标为 p 的字符开始的长度为 l 的一个子串。
+你要将这个子串左右翻转后插在这个子串原来位置的正后方，求最后得到的字符串是什么。字符串的下标是从 0 开始的，你可以从样例中得到更多信息。
+*/
+#include<iostream>
+#include<string>
+#include<vector>
+#include<algorithm>
+using namespace std;
+ 
+ 
+int main()
+{
+    string s;
+    while (cin >> s)
+    {
+        int N;
+        string s1;
+        cin >> N;
+        while (N--)
+        {
+            int m, n;
+            cin >> m >> n;
+            s1 = s.substr(m, n);
+            reverse(s1.begin(), s1.end());
+            //s.append(s1);
+            s.insert(m + n,s1);
+        }
+        cout << s << endl;
+ 
+    }
+}
+
+/*
+现在我们需要查出一些作弊的问答社区中的ID，作弊有两种：1.A回答了B的问题，同时B回答了A的问题。那么A和B都是作弊。2.作弊ID用户A和作弊ID用户B同时回答了C的问题，
+那么C也是作弊。已知每个用户的ID是一串数字，一个问题可能有多个人回答。
+*/
+#include<iostream>
+#include<string>
+#include<vector>
+#include<unordered_map>
+#include<iterator>
+#include<algorithm>
+using namespace std;
+ 
+ 
+void check(unordered_map<int, vector<int> >p)
+{
+    vector<int> v1;
+    unordered_map < int, vector<int> >::iterator ite;
+    unordered_map < int, bool >flags;
+    for (ite = p.begin(); ite != p.end(); ite++)
+    {
+        int N = (*ite).second.size();
+        for (int i = 0; i < N; i++)
+        {
+            int temp = (*ite).second.at(i);
+            for (int j = 0; j < p[temp].size();j++)
+            if (p[temp][j] == (*ite).first)
+            {
+                v1.push_back((*ite).first);
+                flags[(*ite).first] = true;
+            }
+            if (flags[(*ite).first])
+                break;
+        }
+ 
+ 
+    }
+ 
+    for (ite = p.begin(); ite != p.end(); ite++)
+    {
+        if (flags[(*ite).first])
+            continue;
+        int N = (*ite).second.size();
+        int cnt = 0;
+        for (int i = 0; i < N; i++)
+        {
+            int temp = (*ite).second.at(i);
+             
+            if (flags[temp])
+                cnt++;
+        }
+        if (cnt >= 2)
+        {
+            flags[(*ite).first] = true;
+            v1.push_back((*ite).first);
+        }
+    }
+    sort(v1.begin(), v1.end());
+    if (v1.size() == 0)
+        cout << 0 << endl;
+    else
+    {
+        cout << v1.size() << endl;
+        for (int i = 0; i < v1.size() - 1; i++)
+        {
+            cout << v1[i] << " ";
+ 
+        }
+        cout << v1.back() << endl;
+    }
+ 
+ 
+}
+ 
+bool isOf(vector<int> v1, int x)
+{
+    return find(v1.begin(), v1.end(), x) != v1.end();
+}
+int main()
+{
+ 
+    int N;
+    while(cin >> N)
+    {
+        vector<int> v1;
+    unordered_map<int, vector<int> >p;
+    while (N--)
+    {
+        int m, n;
+        cin >> m >> n;
+        for (int i = 0; i < n; i++)
+        {
+            int temp;
+            cin >> temp;
+            if (!isOf(p[m], temp) && m != temp)
+            p[m].push_back(temp);
+        }
+ 
+    }
+ 
+    check(p);
+    }
+    //system("pause");
+    return 0;
+}
+
+/*
+春节期间小明使用微信收到很多个红包，非常开心。在查看领取红包记录时发现，某个红包金额出现的次数超过了红包总数的一半。请帮小明找到该红包金额。写出具体算法思路和代码实现，要求算法尽可能高效。
+
+给定一个红包的金额数组gifts及它的大小n，请返回所求红包的金额。
+
+若没有金额超过总数的一半，返回0。
+测试样例：
+[1,2,3,2,2],5
+返回：2
+*/
+class Gift {
+public:
+int getValue(vector<int> gifts, int n) {
+    // write code here
+    int c=gifts[0];
+    int count = 1;
+    int max=-1;
+    for (int i = 1; i < gifts.size(); i++)
+    {
+        if (gifts[i] == c)
+            count++;
+        else
+            count--;
+ 
+        if (count>max)
+            max = gifts[i];
+        if (count == 0)
+        {
+            c = gifts[i];
+            count = 1;
+        }
+    }
+ 
+    int cnt = 0;
+    for (int i = 0; i < gifts.size();i++)
+    if (gifts[i] == max)
+        cnt++;
+    if (cnt>gifts.size() / 2)
+        return max;
+    else
+        return 0;
+ 
+}
+};
+
+/*
+在一组数的编码中，若任意两个相邻的代码只有一位二进制数不同， 则称这种编码为格雷码(Gray Code)，请编写一个函数，使用递归的方法生成N位的格雷码。
+
+给定一个整数n，请返回n位的格雷码，顺序为从0开始。
+
+测试样例：
+1
+返回：["0","1"]
+*/
+class GrayCode {
+public:
+void helper(vector<string> &result,string s, char c, int n,int flags)
+{
+    if (n <= 0)
+        return;
+    s.push_back(c);
+    if (n == 1)
+        result.push_back(s);
+    if (flags == 0)
+    {
+        helper(result, s, '0', n - 1, 0);
+        helper(result, s, '1', n - 1,1);
+    }
+    else
+    {
+        helper(result, s, '1', n - 1, 0);
+        helper(result, s, '0', n - 1, 1);
+         
+    }
+}
+ 
+vector<string> getGray(int n) {
+    // write code here
+    vector<string> r;
+    string s;
+    helper(r, s, '0', n,0);
+    helper(r, s, '1', n, 1);
+    return r;
+}
+};
+
+/*
+有一个整数数组，请你根据快速排序的思路，找出数组中第K大的数。
+
+给定一个整数数组a,同时给定它的大小n和要找的K(K在1到n之间)，请返回第K大的数，保证答案存在。
+
+测试样例：
+[1,3,5,2,2],5,3
+返回：2
+*/
+class Finder {
+public:
+int partion(vector<int> &v, int s, int d)
+{
+    int i = s, j = d, temp = v[s];
+    if (i < j)
+    {
+        while (i != j)
+        {
+            while (i < j&&v[j] >= temp)
+                j--;
+            v[i] = v[j];
+            while (i < j&&v[i] <= temp)
+                i++;
+            v[j] = v[i];
+ 
+        }
+        v[i] = temp;
+        return i;
+    }
+    else
+        return i;
+}
+ 
+ 
+ 
+int findKth(vector<int> &a, int n, int K) {
+    // write code here
+    int index = partion(a, 0, n - 1);
+    int flags1=0, flags2=n-1;
+    while (index != n - K)
+    {
+        if (index < n - K)
+            index = partion(a, index+1, flags2);
+        else
+            index = partion(a, flags1,index -1);
+ 
+        cout << a[index] << endl;
+ 
+    }
+     
+    return a[index];
+ 
+}
+};
+
+/*
+有一棵二叉树，树上每个点标有权值，权值各不相同，请设计一个算法算出权值最大的叶节点到权值最小的叶节点的距离。二叉树每条边的距离为1，一个节点经过多少条边到达另一个节点为这两个节点之间的距离。
+
+给定二叉树的根节点root，请返回所求距离。
+*/
+/*
+struct TreeNode {
+    int val;
+    struct TreeNode *left;
+    struct TreeNode *right;
+    TreeNode(int x) :
+            val(x), left(NULL), right(NULL) {
+    }
+};*/
+void order(TreeNode* root,int &min,int &max,string &smin,string &smax,char c,string s)
+{
+    if (root != NULL)
+    {
+        s.push_back(c);
+        if (root->left == NULL&&root->right == NULL)
+        {
+            if (root->val < min)
+            {
+                min = root->val;
+                smin = s;
+            }
+            if (root->val>max)
+            {
+                max = root->val;
+                smax = s;
+            }
+        }
+        order(root->left,min,max,smin,smax,'0',s);
+        order(root->right,min,max,smin,smax,'1',s);
+ 
+    }
+}
+ 
+ 
+ 
+class Tree {
+    int min;
+    int max;
+    //vector<TreeNode*> vmin,vmax;
+public:
+ 
+    int getDis(TreeNode* root) {
+        // write code here
+        min = (1 << 31) - 1;
+        max = (1 << 31);
+        string smin, smax,s="";
+        char c = '0';
+        order(root, min, max,smin,smax,c,s);
+ 
+        int i = 0;
+        int result = smin.size()+smax.size();
+        while (smin[i] == smax[i])
+        {
+            result -= 2;
+            i++;
+        }
+        //return helper(root,val);
+        return result;
+ 
+    }
+ 
+ 
+};
+
+/*
+小明陪小红去看钻石，他们从一堆钻石中随机抽取两颗并比较她们的重量。这些钻石的重量各不相同。在他们们比较了一段时间后，它们看中了两颗钻石g1和g2。现在请你根据之前比较的信息判断这两颗钻石的哪颗更重。
+
+给定两颗钻石的编号g1,g2，编号从1开始，同时给定关系数组vector,其中元素为一些二元组，第一个元素为一次比较中较重的钻石的编号，第二个元素为较轻的钻石的编号。最后给定之前的比较次数n。请返回这两颗钻石的关系，若g1更重返回1，g2更重返回-1，无法判断返回0。输入数据保证合法，不会有矛盾情况出现。
+
+测试样例：
+2,3,[[1,2],[2,4],[1,3],[4,3]],4
+返回: 1
+*/
+#include<iostream>
+#include<vector>
+#include<unordered_map>
+#include<queue>
+ 
+class Cmp {
+public:
+ 
+bool check(int g1, int g2, unordered_map<int, vector<int> > m)
+{
+    queue<int>temp;
+    unordered_map<int, bool > flags;
+    temp.push(g1);
+    while (!temp.empty())
+    {
+        int p = temp.front();
+        if (p == g2)
+            return true;
+        flags[p] = true;
+        temp.pop();
+        for (int i = 0; i < m[p].size();i++)
+        if (!flags[m[p][i]])
+            temp.push(m[p][i]);    
+    }
+    return false;
+}
+ 
+int cmp(int g1, int g2, vector<vector<int> > records, int n)
+{
+    unordered_map<int, vector<int> > m;
+    for (int i = 0; i < records.size(); i++)
+        m[records[i][0]].push_back( records[i][1]);
+ 
+    if (check(g1, g2, m))
+        return 1;
+    else
+    {
+        if (check(g2, g1, m))
+ 
+            return -1;
+        else
+            return 0;
+    }
+}
+};
+
+/*
+有一个由很多木棒构成的集合，每个木棒有对应的长度，请问能否用集合中的这些木棒以某个顺序首尾相连构成
+一个面积大于 0 的简单多边形且所有木棒都要用上，简单多边形即不会自交的多边形。
+初始集合是空的，有两种操作，要么给集合添加一个长度为 L 的木棒，要么删去集合中已经有的某个木棒。
+每次操作结束后你都需要告知是否能用集合中的这些木棒构成一个简单多边形。
+*/
+#include<iostream>
+#include<string>
+#include<vector>
+#include<algorithm>
+#include<numeric>
+using namespace std;
+ 
+ 
+void helper(vector<int> &v)
+{
+    sort(v.begin(), v.end());
+    int sum=accumulate(v.begin(), v.end() - 1, 0);
+    if (sum <= v.back())
+        cout << "No" << endl;
+    else
+        cout << "Yes" << endl;
+ 
+     
+}
+int main()
+{
+    int N;
+    while (cin >> N)
+    {
+        vector<int> v;
+        int m, n;
+        while (N--)
+        {
+            cin >> m >> n;
+            if (m == 1)
+                v.push_back(n);
+            else
+            {
+                for (int i = 0; i < v.size(); i++)
+                if (v[i] == n)
+                    v.erase(v.begin() + i);
+            }
+            helper(v);
+        }
+    }
+ 
+    return 0;
+ 
+}
+
+
+/*
+小Q今天在上厕所时想到了这个问题：有n个数，两两组成二元组，差最小的有多少对呢？差最大呢？
+*/
+#include<iostream>
+#include<string>
+#include<vector>
+#include<algorithm>
+using namespace std;
+ 
+ 
+int computeComb(int x)
+{
+    return x*(x - 1) / 2;
+}
+ 
+void helper(vector<int> & v, int n)
+{
+    sort(v.begin(), v.end());
+    int min_dis = (1<<31)-1;
+    for (int i = 1; i < n; i++)
+    {
+        if (v[i] - v[i - 1] < min_dis)
+            min_dis = v[i] - v[i - 1];
+    }
+ 
+ 
+    //最小差值
+    if (min_dis == 0)
+    {
+         
+        int sum = 0;
+        for (int i = 1; i < n;i++)
+        if (v[i] - v[i - 1] == min_dis)
+        {
+             
+            int count = 1;
+            int j = i;
+            while (j < n&&v[j] == v[i - 1])
+                count++,j++;
+ 
+            sum+=computeComb(count);
+            i = j;         
+        }
+        cout << sum << " ";
+ 
+         
+    }
+    else
+    {
+        int count = 0;
+        for (int i = 1; i < n; i++)
+        if (v[i] - v[i - 1] == min_dis)
+        {
+            count++;
+        }
+        cout << count << " ";
+ 
+    }
+    //最大差值
+    if (v[0] == v.back())
+        cout << computeComb(v.size()) << endl;
+    else
+    {
+        int i = 0;
+        int j = n - 1;
+        int count1 = 1, count2 = 1;
+        while (i < n - 1 && v[i + 1] == v[i])
+            count1++,i++;
+        while (j>0 && v[j - 1] == v[j])
+            count2++,j--;
+        cout << count1*count2 << endl;
+    }
+ 
+ 
+}
+ 
+int main()
+{
+    int n;
+     
+    while (cin >> n)
+    {
+ 
+        vector<int> v(n, 0);
+        for (int i = 0; i < n; i++)
+            cin >> v[i];
+        helper(v, n);
+ 
+    }
+ 
+    return 0;
+}
+
+/*
+小Q最近遇到了一个难题：把一个字符串的大写字母放到字符串的后面，各个字符的相对位置不变，且不能申请额外的空间。
+你能帮帮小Q吗？
+*/
+#include<iostream>
+#include<string>
+#include<vector>
+#include<algorithm>
+using namespace std;
+ 
+ 
+ 
+ 
+int main()
+{
+ 
+    string s;
+    while (cin >> s)
+    {
+        stable_partition(s.begin(), s.end(), [](char c){
+            if (c >= 'a')
+                return true;
+            else
+                return false; });
+        cout << s << endl;
+    }
+    return 0;
+ 
+}
+
+/*
+给定一个字符串s，你可以从中删除一些字符，使得剩下的串是一个回文串。如何删除才能使得回文串最长呢？
+输出需要删除的字符个数。
+*/
+#include<iostream>
+#include<string>
+#include<vector>
+#include<algorithm>
+using namespace std;
+ 
+int getMaxConLIS(string s1, string s2)
+{
+    int m = s1.size();
+    int n = s2.size();
+    vector<vector<int> > dp(m + 1, vector<int>(n + 1, 0));
+    for (int i = 1; i <= m; i++)
+    for (int j = 1; j <= n; j++)
+    {
+        if (s1[i - 1] == s2[j - 1])
+            dp[i][j] = dp[i - 1][j - 1] + 1;
+        else
+            dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+    }
+    return dp[m][n];
+}
+int main()
+{
+    string s;
+    while (cin >> s)
+    {
+        cout << s.size() - getMaxConLIS(s, string(s.rbegin(), s.rend())) << endl;
+ 
+    }
+ 
+    return 0;
+}
+
+/*
+小明同学把1到n这n个数字按照一定的顺序放入了一个队列Q中。现在他对队列Q执行了如下程序：
+while(!Q.empty())              //队列不空，执行循环
+
+{
+
+    int x=Q.front();            //取出当前队头的值x
+
+    Q.pop();                 //弹出当前队头
+
+    Q.push(x);               //把x放入队尾
+
+    x = Q.front();              //取出这时候队头的值
+
+    printf("%d\n",x);          //输出x
+
+    Q.pop();                 //弹出这时候的队头
+
+}
+
+做取出队头的值操作的时候，并不弹出当前队头。
+小明同学发现，这段程序恰好按顺序输出了1,2,3,...,n。现在小明想让你构造出原始的队列，你能做到吗？[注：原题样例第三行5有错，应该为3，以下已修正]
+*/
+#include<iostream>
+#include<deque>
+using namespace std;
+ 
+ 
+void helper(int n)
+{
+    deque<int> v;
+    for (int i = n; i >= 1; i--)
+    {      
+        v.push_front(i);
+        int temp = v.back();
+        v.pop_back();
+        v.push_front(temp);
+    }
+    for (int i = 0; i < v.size() - 1; i++)
+        cout << v[i] << " ";
+    cout << v.back() << endl;
+}
+ 
+int main()
+{
+    int N;
+    cin >> N;
+    while (N--)
+    {
+        int n;
+        cin >> n;
+        helper(n);
+    }
+    return 0;
+}
+
+/*
+洗牌在生活中十分常见，现在需要写一个程序模拟洗牌的过程。 现在需要洗2n张牌，从上到下依次是第1张，
+第2张，第3张一直到第2n张。首先，我们把这2n张牌分成两堆，左手拿着第1张到第n张（上半堆），
+右手拿着第n+1张到第2n张（下半堆）。接着就开始洗牌的过程，先放下右手的最后一张牌，再放下左手的最后一张牌，
+接着放下右手的倒数第二张牌，再放下左手的倒数第二张牌，直到最后放下左手的第一张牌。接着把牌合并起来就可以了。
+ 例如有6张牌，最开始牌的序列是1,2,3,4,5,6。首先分成两组，左手拿着1,2,3；右手拿着4,5,6。
+ 在洗牌过程中按顺序放下了6,3,5,2,4,1。把这六张牌再次合成一组牌之后，我们按照从上往下的顺序看这组牌，
+ 就变成了序列1,4,2,5,3,6。 现在给出一个原始牌组，请输出这副牌洗牌k次之后从上往下的序列。
+ */
+#include<iostream>
+#include<vector>
+using namespace std;
+ 
+ 
+void helper(vector<int> &v,int n, int k)
+{
+ 
+    while (k--)
+    {
+        vector<int> v1(v.begin(), v.begin() + n);
+        vector<int> v2(v.begin() + n, v.end());
+        int j = 0;
+        for (int i = 0; i < n; i++)
+        {
+            v[j++] = v1[i];
+            v[j++] = v2[i];
+        }
+ 
+    }
+ 
+ 
+}
+ 
+int main()
+{
+    int N;
+    cin >> N;
+    while (N--)
+    {
+        int n, k;
+        cin >> n >> k;
+        vector<int> v(2*n);
+        for (int i = 0; i < 2*n; i++)
+            cin>>v[i];
+        helper(v,n, k);
+        for (int i = 0; i < 2 * n-1; i++)
+            cout << v[i] << " ";
+        cout<<v.back()<<endl;
+    }
+    return 0;
+}
+
+/*
+一个栈依次压入1,2,3,4,5那么从栈顶到栈底分别为5,4,3,2,1。将这个栈转置后，从栈顶到栈底为1,2,3,4,5，也就是实现了栈中元素的逆序，请设计一个算法实现逆序栈的操作，但是只能用递归函数来实现，而不能用另外的数据结构。
+
+给定一个栈Stack以及栈的大小top，请返回逆序后的栈。
+
+测试样例：
+[1,2,3,4,5],5
+返回：[5,4,3,2,1]
+*/
+class ReverseStack {
+public:
+void reverseStack(vector<int> stack, int i,int top, vector<int> &result)
+{
+    if (i == top)
+        return;
+    reverseStack(stack, i+ 1,top, result);
+    result.push_back(stack[i]);
+}
+ 
+ 
+vector<int> reverseStackRecursively(vector<int> stack, int top) {
+    // write code here
+    vector<int>result;
+    reverseStack(stack, 0, top, result);
+    return result;
+}
+};
+
+/*
+对于一个链表，请设计一个时间复杂度为O(n),额外空间复杂度为O(1)的算法，判断其是否为回文结构。
+
+给定一个链表的头指针A，请返回一个bool值，代表其是否为回文结构。保证链表长度小于等于900。
+
+测试样例：
+1->2->2->1
+返回：true
+*/
+/*
+struct ListNode {
+    int val;
+    struct ListNode *next;
+    ListNode(int x) : val(x), next(NULL) {}
+};*/
+class PalindromeList {
+public:
+bool chkPalindrome(ListNode* &A) {
+    // write code here
+ 
+    if (A == NULL || A->next == NULL)
+        return true;
+ 
+    ListNode *p1 = A, *p2 = A, *pre=NULL;
+    while (p2 != NULL&&p2->next != NULL)
+    {
+        pre = p1;
+        p1 = p1->next;
+        p2 = p2->next->next;
+ 
+    }
+ 
+    p1=pre;
+ 
+ 
+    ListNode *ptr1 = p1->next, *ptr2, *q = p1;
+    while (ptr1 != NULL)
+    {
+        ptr2 = ptr1->next;
+        ptr1->next = q;
+        q = ptr1;
+        ptr1 = ptr2;
+ 
+    }
+ 
+    while (A!= q && q->next != A)
+    {
+        if (A->val != q->val)
+            return false;
+        else
+        {
+            A = A->next;
+            q = q->next;
+ 
+        }
+ 
+    }
+    return true;
+}
+};
+
+/*
+请把纸条竖着放在桌⼦上，然后从纸条的下边向上⽅对折，压出折痕后再展 开。此时有1条折痕，突起的⽅向指向纸条的背⾯，这条折痕叫做“下”折痕 ；突起的⽅向指向纸条正⾯的折痕叫做“上”折痕。如果每次都从下边向上⽅ 对折，对折N次。请从上到下计算出所有折痕的⽅向。
+
+给定折的次数n,请返回从上到下的折痕的数组，若为下折痕则对应元素为"down",若为上折痕则为"up".
+
+测试样例：
+1
+返回：["down"]
+*/
+void printupdown(int x, int n, bool flags,vector<string> &result)
+{
+    if (x == n)
+        return;
+    printupdown(x + 1, n, true,result);
+    if (flags)
+        //cout << "down" << endl;
+        result.push_back("down");
+    else
+        //cout << "up" << endl;
+        result.push_back("up");
+    printupdown(x + 1, n, false,result);
+ 
+}
+ 
+class FoldPaper {
+public:
+    vector<string> foldPaper(int n) {
+        // write code here
+      vector<string> result; 
+    printupdown(0, n, true,result);
+        return result;
+         
+    }
+};
+/*
+输入一个字符串，求出该字符串包含的字符集合*/
+#include<iostream>
+#include<string>
+#include<set>
+using namespace std;
+string getResult(string s)
+{
+    string r;
+    //map<char, bool> m;
+    set<char> v;
+    for (int i = 0; i < s.size(); i++)
+    {
+        if (v.count(s[i]) == 0)
+        {
+            r.push_back(s[i]);
+            v.insert(s[i]);
+        }
+ 
+ 
+    }
+    return r;
+ 
+}
+int main()
+{
+    string s;
+    while(cin>>s)
+    {
+        cout<<getResult(s)<<endl;;
+         
+    }
+    return 0;
+     
+}
+
+/*
+对于两个字符串A和B，我们需要进行插入、删除和修改操作将A串变为B串，定义c0，c1，c2分别为三种操作的代价，请设计一个高效算法，求出将A串变为B串所需要的最少代价。
+
+给定两个字符串A和B，及它们的长度和三种操作代价，请返回将A串变为B串所需要的最小代价。保证两串长度均小于等于300，且三种代价值均小于等于100。
+
+测试样例：
+"abc",3,"adc",3,5,3,100
+返回：8
+*/
+class MinCost {
+public:
+int findMinCost(string A, int n, string B, int m, int c0, int c1, int c2) {
+    // write code here
+    vector<vector<int> >dp(n+1, vector<int>(m+1, 0));
+    for (int i = 0; i <= m; i++)
+        dp[0][i] = i*c0;
+    for (int i = 0; i <= n; i++)
+        dp[i][0] = i*c1;
+ 
+    for (int i = 1; i <= n;i++)
+    for (int j = 1; j <= m; j++)
+    {
+        if (A[i-1] == B[j-1])
+            dp[i][j] = dp[i - 1][j - 1];
+        else
+            dp[i][j] = min(dp[i - 1][j - 1] + c2, min(dp[i - 1][j] + c1, dp[i][j - 1] + c0));
+    }
+ 
+    //display(dp);
+ 
+     
+    return dp[n][m];
+ 
+}
+};
+
+/*
+在地下室里放着n种颜色的手套，手套分左右手，但是每种颜色的左右手手套个数不一定相同。A先生现在要出门，所以他要去地下室选手套。但是昏暗的灯光让他无法分辨手套的颜色，只能分辨出左右手。所以他会多拿一些手套，然后选出一双颜色相同的左右手手套。现在的问题是，他至少要拿多少只手套(左手加右手)，才能保证一定能选出一双颜色相同的手套。
+
+给定颜色种数n(1≤n≤13),同时给定两个长度为n的数组left,right,分别代表每种颜色左右手手套的数量。数据保证左右的手套总数均不超过26，且一定存在至少一种合法方案。
+
+测试样例：
+4,[0,7,1,6],[1,5,0,6]
+返回：10(解释：可以左手手套取2只，右手手套取8只)
+*/
+class Gloves {
+public:
+    int findMinimum(int n, vector<int> left, vector<int> right) {
+        // write code here
+        int max1 = 0,max2 = 0;
+        int min1 = 27,min2 = 27;
+        int i;
+        for(i=0;i<n;i++){
+            if(left[i] == 0){
+                max1 = max1+right[i];
+            }
+            else{
+                max1 = max1+left[i];
+            }
+            if(right[i] == 0){
+                max2 = max2+left[i];
+            }
+            else{
+                max2 = max2+right[i];
+            }
+            if(left[i]!=0 && right[i]!=0 && left[i]<min1){
+                min1 = left[i];
+            }
+            if(right[i]!=0 && left[i]!=0 && right[i]<min2){
+                min2 = right[i];
+            }
+        }
+        max1 = max1-min1+2;
+        max2 = max2-min2+2;
+        return (max1<max2)?max1:max2;
+ 
+         
+    }
+};
+
+
+/*
+对于两棵彼此独立的二叉树A和B，请编写一个高效算法，检查A中是否存在一棵子树与B树的拓扑结构完全相同。
+
+给定两棵二叉树的头结点A和B，请返回一个bool值，代表A中是否存在一棵同构于B的子树。*/
+/*
+struct TreeNode {
+    int val;
+    struct TreeNode *left;
+    struct TreeNode *right;
+    TreeNode(int x) :
+            val(x), left(NULL), right(NULL) {
+    }
+};*/
+bool check(TreeNode* A, TreeNode* B)
+    {
+        if(A==NULL&&B==NULL)
+            return true;
+        else if(A==NULL&&B!=NULL)
+            return false;
+        else if(A!=NULL&&B==NULL)
+            return false;
+        else
+            return check(A->left, B->left)&&check(A->right, B->right);
+    }
+void order(TreeNode* A, TreeNode* B,bool &flags,int &f)
+{
+    if(A!=NULL&&f)
+   {
+    if(A->val==B->val)
+    {
+         
+        flags=check(A, B);
+        if(flags)
+        {
+            f=0;
+            return ;
+        }
+    }
+    order(A->left,B,flags,f);
+    order(A->right,B,flags,f);
+ 
+    }
+     
+     
+}
+ 
+ 
+class IdenticalTree {
+public:
+    bool chkIdentical(TreeNode* A, TreeNode* B) {
+        // write code here
+         bool flags=false;
+        int f=1;
+        order(A, B,flags,f);
+        return flags;
+ 
+             
+    }
+};
+
+
+/*
+小东所在公司要发年终奖，而小东恰好获得了最高福利，他要在公司年会上参与一个抽奖游戏，游戏在一个6*6的棋盘上进行，上面放着36个价值不等的礼物，每个小的棋盘上面放置着一个礼物，他需要从左上角开始游戏，每次只能向下或者向右移动一步，到达右下角停止，一路上的格子里的礼物小东都能拿到，请设计一个算法使小东拿到价值最高的礼物。
+
+给定一个6*6的矩阵board，其中每个元素为对应格子的礼物价值,左上角为[0,0],请返回能获得的最大价值，保证每个礼物价值大于100小于1000*/
+
+class Bonus {
+public:
+int getMost(vector<vector<int> > board) {
+    // write code here
+     
+    vector<vector<int> >dp(6, vector<int>(6, 0));
+    for (int i = 0; i < 6;i++)
+    for (int j = 0; j < 6; j++)
+    {
+        if (i == 0 && j == 0)
+            dp[i][j] = board[i][j];
+        else if (i==0&&j>0)
+            dp[i][j] = board[i][j]+dp[i][j-1];
+        else if (i > 0 && j==0)
+            dp[i][j] = +board[i][j]+dp[i-1][j];
+        else
+            dp[i][j] = max(dp[i - 1][j], dp[i][j-1])+board[i][j];
+    }
+    return dp[5][5];
+ 
+}
+};
+
+/*
+对于一个字符串，请设计一个高效算法，计算其中最长回文子串的长度。
+
+给定字符串A以及它的长度n，请返回最长回文子串的长度。
+
+测试样例：
+"abc1234321ab",12
+返回：7
+*/
+class Palindrome {
+public:
+bool check(const string &A,int s,int d)
+{
+    int i=s,j=d;
+    while(i<j)
+    {
+        if(A[i]==A[j])
+            i++,j--;
+        else
+            break;
+    }
+    if(i<j)
+        return false;
+    else
+        return true;
+}
+int getLongestPalindrome(string A, int n) {
+ 
+    vector<int> dp(n,0);
+    int max=-1;
+    for(int i=0;i<n;i++)
+    {
+        for(int j=i;j>=0;j--)
+        {
+            if(check(A,j,i))
+            {
+                dp[i]=i-j+1;
+            }
+        }
+        max=max>dp[i]?max:dp[i];
+    }
+    return max;
+ 
+}
+};
+
+/*
+正在挑战一个CrackMe的你，把需要填写的前面几位密码都正确猜出了，可是这最后一位密码，好像藏得有点深
+。CrackMe的作者还挑衅般的在里面藏了个.tar.gz文件，解压缩出来，
+里面写道 你要的最后一个字符就在下面这个字符串里，这个字符是下面整个字符串中第一个只出现一次的字符。
+（比如，串是abaccdeff，那么正确字符就是b了） 然而下面给出来的字符串好像太长太长了，单靠人力完全无法找出来。
+ 于是，你需要写一个程序代劳了。输入文件体积较大，请使用一些快速的输入输出手段，
+ 不推荐使用cin/cout，对Java并不推荐使用Scanner直接读写。
+ */
+#include <iostream>
+#include<vector>
+using namespace std;
+ 
+ 
+char check(const string &s)
+{
+    vector<int> v(100,0);
+    for(int i=0;i<s.size();i++)
+        v[s[i]-33]++;
+    for(int i=0;i<s.size();i++)
+        if(v[s[i]-33]==1)
+            return s[i];
+      return 0;
+}
+ 
+int main()
+{
+    int N;
+    while(cin>>N)
+    {
+        while(N--)
+        {
+            string s;
+            cin>>s;
+            cout<<check(s)<<endl;
+        }
+ 
+    }
+    return 0;
+}
+
+//KMP算法
+#include "vector"
+#include "string"
+#include <iostream>
+#include "algorithm"
+
+using namespace std;
+
+//计算模式P的部分匹配值，保存在next数组中  
+void MakeNext(const string &P, vector<int> &next)
+{
+	int q,k;//k记录所有前缀的对称值  
+	int m = P.size();//模式字符串的长度  
+	next[0] = 0;//首字符的对称值肯定为0  
+	for (q = 1, k = 0; q < m; ++q)//计算每一个位置的对称值  
+	{
+		//k总是用来记录上一个前缀的最大对称值  
+		while (k > 0 && P[q] != P[k])
+			k = next[k - 1];//k将循环递减，值得注意的是next[k]<k总是成立  
+		if (P[q] == P[k])
+			k++;//增加k的唯一方法  
+		next[q] = k;//获取最终值  
+	}
+}
+
+
+void KmpMatch(const string &T, const string &P, vector<int> &next)
+{
+	int n, m;
+	n = T.size();
+	m = P.size();
+	MakeNext(P, next);
+	for (int i = 0, q = 0; i < n; ++i)
+	{
+		while (q > 0 && P[q] != T[i])
+			q = next[q - 1];
+		if (P[q] == T[i])
+			q++;
+		if (q == m)
+		{
+			cout << "模式文本的偏移为：" << (i - m + 1) << endl;
+			q = next[q - 1];//寻找下一个匹配
+		}
+	}
+}
+
+int main()
+{
+	system("color 0A");
+	vector<int> next(20,0);//保存待搜索字符串的部分匹配表（所有前缀函数的对称值）
+	string T = "xyxababcaxxxababca";//文本
+	string P = "ababca";//待搜索字符串
+	cout <<"文本字符串："<< T << endl;
+	cout <<"模式字符串："<< P << endl;
+	KmpMatch(T, P, next);
+	cout << "模式字符串的前缀函数表："<< endl;
+	for (int i = 0; i < P.size(); i++)
+		cout<< next[i];
+	cout << endl;
+	system("pause");
+	return 0;
+}
+
+//字符串分割
+#include <string.h>
+#include <stdio.h>
+
+int main(){
+  char s[] = "a,b*c,d";
+  const char *sep = ",*"; //可按多个字符来分割
+  char *p;
+  p = strtok(s, sep);
+  while(p){
+    printf("%s ", p);
+    p = strtok(NULL, sep);
+  }
+  printf("\n");
+  return 0;
+}
+
+void SplitString(const std::string& s, std::vector<std::string>& v, const std::string& c)
+{
+  std::string::size_type pos1, pos2;
+  pos2 = s.find(c);
+  pos1 = 0;
+  while(std::string::npos != pos2)
+  {
+    v.push_back(s.substr(pos1, pos2-pos1));
+ 
+    pos1 = pos2 + c.size();
+    pos2 = s.find(c, pos1);
+  }
+  if(pos1 != s.length())
+    v.push_back(s.substr(pos1));
+}
+
+vector<string> split(const string &str,const string &pattern)
+{
+    //const char* convert to char*
+    char * strc = new char[strlen(str.c_str())+1];
+    strcpy(strc, str.c_str());
+    vector<string> resultVec;
+    char* tmpStr = strtok(strc, pattern.c_str());
+    while (tmpStr != NULL)
+    {
+        resultVec.push_back(string(tmpStr));
+        tmpStr = strtok(NULL, pattern.c_str());
+    }
+
+    delete[] strc;
+
+    return resultVec;
+}
+
+//计算润年
+for(int i = 2000;i < 3000;i++){
+    if((i % 100 == 0 && i % 400 == 0) || i % 4 == 0){
+        //输出i的值
+    }
+}
+
+
+
+
+
+
+
+

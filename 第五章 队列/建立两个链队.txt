@@ -1,0 +1,56 @@
+      /*队列的链表实现*/
+#include<iostream.h>
+struct Node
+{
+	int num;
+	struct Node *next;
+};
+void EnQueue(Node **front,Node **rear,int i)//入链队
+{
+	Node *newnode=new Node;
+	newnode->num=i;
+	newnode->next=NULL;
+	if(*front==NULL)
+	{
+		*front=newnode;
+		*rear=newnode;
+	}
+	else
+	{
+		(*rear)->next=newnode;
+		*rear=newnode;
+	}
+}
+int DeQueue(Node **front,Node **rear)//出链队
+{
+	int k;
+	Node **ptr;
+	if(*front==NULL)
+	{
+		cout<<"栈空，无法出栈。"<<endl;
+		return -1;
+	}
+	else
+	{
+		*ptr=*front;
+		k=(*front)->num;
+		*front=(*front)->next;
+		//delete *ptr;
+		return k;
+	}
+}
+void main()
+{
+	Node *front1=NULL,*rear1=NULL;//定义全局的头尾指针
+	//for(int i=1;i<=5;i++)
+	cout<<front1<<endl;
+		EnQueue(&front1,&rear1,1);
+		cout<<front1<<endl;
+		cout<<front1->num<<endl;
+	//cout<<DeQueue(&front1,&rear1)<<endl;
+	/*cout<<DeQueue(front1,rear1)<<endl;
+	cout<<DeQueue(front1,rear1)<<endl;
+	cout<<DeQueue(front1,rear1)<<endl;
+	cout<<DeQueue(front1,rear1)<<endl;
+	cout<<DeQueue(front1,rear1)<<endl;*/
+}
